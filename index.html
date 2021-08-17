@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+
+<html>
+
+  <head>
+
+    <title>Socket.IO chat</title>
+
+    <style>
+
+      body { margin: 0; padding-bottom: 3rem; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+
+
+
+      #form { background: rgba(0, 0, 0, 0.15); padding: 0.25rem; position: fixed; bottom: 0; left: 0; right: 0; display: flex; height: 3rem; box-sizing: border-box; backdrop-filter: blur(10px); }
+
+      #input { border: none; padding: 0 1rem; flex-grow: 1; border-radius: 2rem; margin: 0.25rem; }
+
+      #input:focus { outline: none; }
+
+      #form > button { background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff; }
+
+
+
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+
+      #messages > li { padding: 0.5rem 1rem; }
+
+      #messages > li{ background: white; }
+
+    </style>
+
+  </head>
+
+  <body>
+
+    <ul id="messages"></ul>
+
+    <form id="form" action="">
+
+      <input  id="input" autocomplete="off" /><button>Send</button>
+
+    </form>
+
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>
+
+        var socket = io();
+        var nome = prompt("Digite seu nome:")
+        alert("Bem vindo " + nome)
+        var messages = document.getElementById("messages")
+        var input = document.getElementById("input")
+        var form = document.getElementById("form")
+        if(nome){
+          socket.emit("novo usuario",{usuario:nome})
+          var text = document.createElement("li")
+          text.textContent = "Ultimas mensagens"
+          messages.appendChild(text)
+          fetch("http://localhost:3000/chat/lastmessages",{method:'GET'}).then((res) => res.json()).then((json)=>{
+              console.log(json)
+              json.forEach(element => {
+                  var item = document.createElement("li")
+                  if(element.nome == nome){
+                    item.textContent ="Você disse: "+element.mensagem
+                    item.style.background = "gray"
+                  }else{
+                    item.textContent = element.nome+" disse: "+element.mensagem
+                    item.style.background = "white"
+                  }
+                  messages.appendChild(item)
+                 
+                 
+                  
+              });
+
+           }
+        )
+        }
+        form.addEventListener("submit",(e) => {
+          e.preventDefault()
+          if(input.value){
+            socket.emit("chat message",{nome:nome,message:input.value})
+            input.value =''
+
+          }
+        })
+
+        socket.on("chat message",(obj)=>{
+
+            if(obj.nome == nome){
+                var item = document.createElement("li")
+                item.textContent = "Você disse :"+obj.message 
+                item.style.background = "gray"
+                messages.appendChild(item)
+            }else{
+                var item = document.createElement("li")
+                item.textContent = obj.nome+" disse :"+obj.message 
+                item.style.background = "white"
+                messages.appendChild(item)
+
+            }
+
+        })
+
+        socket.on("conectado",(obj) => {
+           var newUser = document.createElement("li")  
+           newUser.textContent = obj.usuario+" entrou no chat"  
+           newUser.style.background = "cyan"
+           messages.appendChild(newUser)
+        })
+
+    </script>
+
+  </body>
+
+</html>

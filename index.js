@@ -1,7 +1,9 @@
+const historyChatController = require('./src/controllers/historyChatController');
+
 const app = require('express')();
 
 const http = require('http').createServer(app);
-
+const history = require("./src/controllers/historyChatController")
 const io = require('socket.io')(http);
 
 var usuarios = []
@@ -13,7 +15,7 @@ app.get('/', (req, res) => {
 });
 
 app.get("/chat/lastmessages",(req,res)=>{
-    res.json(mensagens)
+    historyChatController.getHistory(req,res)
 })
 
  io.on('connection',(socket)=>{
@@ -25,6 +27,7 @@ app.get("/chat/lastmessages",(req,res)=>{
     socket.on("chat message",(obj)=>{
         mensagens.push({nome:obj.nome,mensagem:obj.message})
         io.emit("chat message",obj)
+        history.history(obj.nome,obj.message)
     })
 
 

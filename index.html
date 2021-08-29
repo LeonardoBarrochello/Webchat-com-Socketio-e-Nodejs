@@ -19,9 +19,6 @@
       #input:focus { outline: none; }
 
       #form > button { background: #333; border: none; padding: 0 1rem; margin: 0.25rem; border-radius: 3px; outline: none; color: #fff; }
-
-
-
       #messages { list-style-type: none; margin: 0; padding: 0; }
 
       #messages > li { padding: 0.5rem 1rem; }
@@ -45,7 +42,6 @@
     <script src="/socket.io/socket.io.js"></script>
 
     <script>
-
         var socket = io();
         var nome = prompt("Digite seu nome:")
         alert("Bem vindo " + nome)
@@ -61,17 +57,14 @@
               console.log(json)
               json.forEach(element => {
                   var item = document.createElement("li")
-                  if(element.nome == nome){
-                    item.textContent ="Você disse: "+element.mensagem
+                  if(element.name == nome){
+                    item.textContent ="Você disse: "+element.message
                     item.style.background = "gray"
                   }else{
-                    item.textContent = element.nome+" disse: "+element.mensagem
+                    item.textContent = element.name+" disse: "+element.message
                     item.style.background = "white"
                   }
-                  messages.appendChild(item)
-                 
-                 
-                  
+                  messages.appendChild(item)          
               });
 
            }

@@ -44,31 +44,37 @@
     <script>
         var socket = io();
         var nome = prompt("Digite seu nome:")
-        alert("Bem vindo " + nome)
         var messages = document.getElementById("messages")
         var input = document.getElementById("input")
         var form = document.getElementById("form")
         if(nome){
-          socket.emit("novo usuario",{usuario:nome})
-          var text = document.createElement("li")
-          text.textContent = "Ultimas mensagens"
-          messages.appendChild(text)
-          fetch("http://localhost:3000/chat/lastmessages",{method:'GET'}).then((res) => res.json()).then((json)=>{
-              console.log(json)
-              json.forEach(element => {
-                  var item = document.createElement("li")
-                  if(element.name == nome){
-                    item.textContent ="Você disse: "+element.message
-                    item.style.background = "gray"
+              socket.emit("novo usuario",{usuario:nome})
+              socket.on("novo usuario",function(data){
+                  if(data.sucesso){
+                     alert("Bem vindo" + nome)
                   }else{
-                    item.textContent = element.name+" disse: "+element.message
-                    item.style.background = "white"
+                     alert("Já existe um usuario logado com esse nome!!")
+                     window.location.href = "/";
                   }
-                  messages.appendChild(item)          
-              });
-
-           }
-        )
+              })
+              var text = document.createElement("li")
+              text.textContent = "Ultimas mensagens"
+              messages.appendChild(text)
+              fetch("http://localhost:3000/chat/lastmessages",{method:'GET'}).then((res) => res.json()).then((json)=>{
+                  console.log(json)
+                  json.forEach(element => {
+                      var item = document.createElement("li")
+                      if(element.name == nome){
+                        item.textContent ="Você disse: "+element.message
+                        item.style.background = "gray"
+                      }else{
+                        item.textContent = element.name+" disse: "+element.message
+                        item.style.background = "white"
+                      }
+                      messages.appendChild(item)          
+                  });
+              }
+            )
         }
         form.addEventListener("submit",(e) => {
           e.preventDefault()

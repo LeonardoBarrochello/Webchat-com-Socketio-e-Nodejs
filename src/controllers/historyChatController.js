@@ -12,5 +12,6 @@ module.exports = {
             const messages =  await db.all("SELECT * FROM historyChat")
             res.json(messages)
         }
+        
 
 }
